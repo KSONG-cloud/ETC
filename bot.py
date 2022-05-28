@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
 import argparse
-from collections import deque
+from collections
 from enum import Enum
 import time
 import socket
 import json
-import defaultdict
 
 team_name = "TABLETURNERS"
 
