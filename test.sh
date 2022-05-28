@@ -1,1 +1,1 @@
-python3 sample-bot.py --test prod-like
+python3 bot.py --test prod-like
