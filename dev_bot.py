@@ -27,7 +27,7 @@ def main():
     hello_message = exchange.read_message()
     print("First message from exchange:", hello_message)
 
-    timer_penny = Delaytimer(0.05)
+    timer_penny = Delaytimer(0.01, 0.005)
     timer_offer = Delaytimer(0.01)
     timer_balance = Delaytimer(1)
     while True:
@@ -146,9 +146,9 @@ def bookdata_update(bookdata: dict, message: dict):
         # print("bookdata: ", bookdata)
 
 class Delaytimer:
-    def __init__(self, delay):
+    def __init__(self, delay, offset = 0):
         self.delay = delay
-        self.wait_until = time.time() + self.delay
+        self.wait_until = time.time() + self.delay+offset
 
     def update(self):
         if self.wait_until < time.time():

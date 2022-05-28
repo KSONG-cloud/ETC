@@ -27,6 +27,7 @@ def main():
     hello_message = exchange.read_message()
     print("First message from exchange:", hello_message)
 
+    timer_penny = Delaytimer(0.05)
     timer_offer = Delaytimer(0.01)
     timer_balance = Delaytimer(1)
     while True:
@@ -34,18 +35,23 @@ def main():
         bookdata_update(bookdata, message)
         positions_update(positions, message)
 
-        if timer_offer.update():
+        if timer_penny.update():
             # Penny Pinching on BONDS
             orderid += 1
             exchange.send_add_message(order_id=orderid, symbol="BOND", dir=Dir.BUY, price=999, size=1)
             orderid += 1
             exchange.send_add_message(order_id=orderid, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
 
+        if timer_offer.update():
             # Penny Pinching on ADR
             ADR_trade(exchange)
 
+            # Penny Pinching on XLF
+            XLF_trade(exchange)
+
         if timer_balance.update():
             ADR_balance(exchange)
+            XLF_balance(exchange)
 
         # main_debug_print(message, see_bestprice = False)
         if message["type"] == "close":
@@ -81,6 +87,47 @@ def ADR_balance(exchange, safeguard = 5):
         exchange.send_add_message(order_id=orderid, symbol="VALE",
          dir=Dir.BUY, price=bookdata["VALE"]["sell"][0], size=-positions["VALE"]-safeguard)
         exchange.send_cancel_message(order_id=orderid)
+
+def XLF_trade(exchange, margin=10):
+    global orderid
+    weights = [3, 2, 3, 2]
+    n = sum(weights)
+    prices = [1000]+list(bookdata_price_average(s) for s in ['GS', 'MS', 'WFC'])
+    if None in prices:
+        print("There is a None here!")
+        return
+    fairvalue = int(sum(prices[i]*weights[i]/n for i in range(4)))
+
+    print("Fair value:",fairvalue, bookdata["XLF"])
+    orderid += 1
+    exchange.send_add_message(order_id=orderid, symbol="XLF",
+     dir=Dir.SELL, price=fairvalue+margin, size=10)
+    exchange.send_cancel_message(order_id=orderid)
+
+    orderid += 1
+    exchange.send_add_message(order_id=orderid, symbol="XLF",
+     dir=Dir.BUY, price=fairvalue-margin, size=10)
+    exchange.send_cancel_message(order_id=orderid)
+
+def XLF_balance(exchange, safeguard = 50):
+    global orderid
+    if positions["XLF"]>safeguard:
+        orderid += 1
+        exchange.send_add_message(order_id=orderid, symbol="XLF",
+         dir=Dir.SELL, price=bookdata["XLF"]["buy"][0], size=positions["XLF"]-safeguard)
+        exchange.send_cancel_message(order_id=orderid)
+    elif positions["XLF"]<-safeguard:
+        orderid += 1
+        exchange.send_add_message(order_id=orderid, symbol="XLF",
+         dir=Dir.BUY, price=bookdata["XLF"]["sell"][0], size=-positions["XLF"]-safeguard)
+        exchange.send_cancel_message(order_id=orderid)
+
+def bookdata_price_average(symbol):
+    bid_price = bookdata[symbol]["buy"][0]
+    ask_price = bookdata[symbol]["sell"][0]
+    if bid_price!=None and ask_price!=None:
+        return (bid_price + ask_price) // 2
+    return None
 
 def positions_update(positions: dict, message: dict):
     if message["type"] == "fill":
