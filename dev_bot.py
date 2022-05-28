@@ -17,6 +17,7 @@ positions = {s : 0 for s in symbols}
 orderid = 0
 
 def main():
+    global orderid
 
     # Setup
     args = parse_arguments()
@@ -52,6 +53,7 @@ def main():
             break
 
 def ADR_trade(margin=1):
+    global orderid
     valbz_bid_price = bookdata["VALBZ"]["buy"][0]
     valbz_ask_price = bookdata["VALBZ"]["sell"][0]
     if valbz_bid_price!=None and valbz_ask_price!=None:
@@ -68,6 +70,7 @@ def ADR_trade(margin=1):
         exchange.send_cancel_message(order_id=orderid)
 
 def ADR_balance(safeguard = 5):
+    global orderid
     if positions["VALE"]>safeguard:
         orderid += 1
         exchange.send_add_message(order_id=orderid, symbol="VALE",
