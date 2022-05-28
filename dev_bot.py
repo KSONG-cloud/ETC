@@ -85,7 +85,7 @@ def ADR_balance(exchange, safeguard = 5):
          dir=Dir.BUY, price=bookdata["VALE"]["sell"][0], size=-positions["VALE"]-safeguard)
         exchange.send_cancel_message(order_id=orderid)
 
-def XLF_trade(exchange, margin=5):
+def XLF_trade(exchange, margin=1):
     global orderid
     weights = [3, 2, 3, 2]
     n = sum(weights)
@@ -98,12 +98,12 @@ def XLF_trade(exchange, margin=5):
     print("Fair value:",fairvalue, bookdata["XLF"])
     orderid += 1
     exchange.send_add_message(order_id=orderid, symbol="XLF",
-     dir=Dir.SELL, price=fairvalue+margin, size=10)
+     dir=Dir.SELL, price=fairvalue+margin, size=1)
     exchange.send_cancel_message(order_id=orderid)
 
     orderid += 1
     exchange.send_add_message(order_id=orderid, symbol="XLF",
-     dir=Dir.BUY, price=fairvalue-margin, size=10)
+     dir=Dir.BUY, price=fairvalue-margin, size=1)
     exchange.send_cancel_message(order_id=orderid)
 
 def XLF_balance(exchange, safeguard = 5):
