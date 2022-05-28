@@ -33,10 +33,10 @@ def main():
 
         if timer_bond.update():
             # Penny Pinching
-            order_id += 1
-            exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.BUY, price=999, size=1)
-            order_id += 1
-            exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
+            # order_id += 1
+            # exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.BUY, price=999, size=1)
+            # order_id += 1
+            # exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
 
             # Modeling ADR with share
 
