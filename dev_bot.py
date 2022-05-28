@@ -45,31 +45,35 @@ def main():
 
             # Modeling ADR with share
 
-            if message["type"] == "book":
-                print("message:",message)
-            if message["type"] == "book" and message["symbol"] == "VALBZ":
+            # if message["type"] == "book":
+            #     print("message:",message)
+            # if message["type"] == "book" and message["symbol"] == "VALBZ":
+            #
+            #     def best_price(side):
+            #         if message[side]:
+            #             return message[side][0][0]
+            #
+            #
+            #     valbz_bid_price = best_price("buy")
+            #     valbz_ask_price = best_price("sell")
+            valbz_bid_price = bookdata["VALBZ"]["buy"][0]
+            valbz_ask_price = bookdata["VALBZ"]["sell"][0]
+            if valbz_bid_price!=None and valbz_ask_price!=None:
+                valbz_fairvalue = (valbz_bid_price + valbz_ask_price) // 2
 
-                def best_price(side):
-                    if message[side]:
-                        return message[side][0][0]
+                if buy_id!=None and sell_id!=None:
+                    exchange.send_cancel_message(order_id=buy_id)
+                    exchange.send_cancel_message(order_id=sell_id)
 
+                order_id += 1
+                sell_id = order_id
+                exchange.send_add_message(order_id=order_id, symbol="VALE",
+                 dir=Dir.SELL, price=valbz_fairvalue+1, size=1)
 
-                valbz_bid_price = best_price("buy")
-                valbz_ask_price = best_price("sell")
-            valbz_fairvalue = (valbz_bid_price + valbz_ask_price) // 2
-            if buy_id!=None and sell_id!=None:
-
-                exchange.send_cancel_message(order_id=buy_id)
-                exchange.send_cancel_message(order_id=sell_id)
-
-            order_id += 1
-            exchange.send_add_message(order_id=order_id, symbol="VALE",
-             dir=Dir.SELL, price=valbz_fairvalue+1, size=1)
-            sell_id = order_id
-            order_id += 1
-            buy_id = order_id
-            exchange.send_add_message(order_id=order_id, symbol="VALE",
-             dir=Dir.BUY, price=valbz_fairvalue-1, size=1)
+                order_id += 1
+                buy_id = order_id
+                exchange.send_add_message(order_id=order_id, symbol="VALE",
+                 dir=Dir.BUY, price=valbz_fairvalue-1, size=1)
 
             #
             # if (valbz_bid_price!=None and valbz_ask_price!=None and
