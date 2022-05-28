@@ -92,7 +92,6 @@ def XLF_trade(exchange, margin=5):
     prices = [1000]+list(bookdata_price_average(s) for s in ['GS', 'MS', 'WFC'])
     if None in prices: return
     fairvalue = sum(prices[i]*weights[i]/n for i in range(4))
-
     orderid += 1
     exchange.send_add_message(order_id=orderid, symbol="XLF",
      dir=Dir.SELL, price=fairvalue+margin, size=10)
@@ -117,8 +116,8 @@ def XLF_balance(exchange, safeguard = 5):
     #     exchange.send_cancel_message(order_id=orderid)
 
 def bookdata_price_average(symbol):
-    bid_price = bookdata[symbol]["buy"][0]
-    ask_price = bookdata[symbol]["sell"][0]
+    bid_price = bookdata[symbol]["buy"][0][0]
+    ask_price = bookdata[symbol]["sell"][0][0]
     if bid_price!=None and ask_price!=None:
         return (bid_price + ask_price) // 2
     return None
