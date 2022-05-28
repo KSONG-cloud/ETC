@@ -29,7 +29,7 @@ def main():
 
     while True:
         message = exchange.read_message()
-        if order_id = 0: print(message)
+        if message["type"] == "book": print("message recieved:", message)
 
         if wait_until < time.time():
             wait_until = time.time() + wait_time
@@ -39,7 +39,11 @@ def main():
             exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.BUY, price=999, size=10)
             order_id += 1
             exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.SELL, price=1001, size=10)
-            if main_debug_print(message, see_bestprice = False): break
+
+            # main_debug_print(message, see_bestprice = False)
+            if message["type"] == "close":
+                print("The round has ended")
+                break
 
 def positions_update(dict, security, quantity):
 
@@ -55,7 +59,6 @@ def main_debug_print(message, see_bestprice):
     # important for you!
     if message["type"] == "close":
         print("The round has ended")
-        return True
     elif message["type"] == "error":
         print(message)
     elif message["type"] == "reject":
@@ -83,7 +86,6 @@ def main_debug_print(message, see_bestprice):
                             "vale_ask_price": vale_ask_price,
                         }
                     )
-    return False
 
 
 # ~~~~~============== PROVIDED CODE ==============~~~~~
