@@ -121,7 +121,7 @@ class Delaytimer:
         self.wait_until = time.time() + self.delay
 
     def update(self):
-        print(self)
+        print(list(self))
         if self.wait_until < time.time():
             self.wait_until = time.time() + self.delay
             return True
