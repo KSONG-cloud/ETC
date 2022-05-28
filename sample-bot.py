@@ -65,9 +65,9 @@ def main():
 
         # Penny Pinching
         exchange.send_add_message(order_id=1, symbol="BOND", dir=Dir.BUY, price=999, size=5)
-        exchange.send_add_message(order_id=1, symbol="BOND", dir=Dir.SELL, price=1001, size=5)
+        exchange.send_add_message(order_id=2, symbol="BOND", dir=Dir.SELL, price=1001, size=5)
 
-        main_debug_print(message, see_bestprice = False)
+        if main_debug_print(message, see_bestprice = False): break
 
 def main_debug_print(message, see_bestprice):
     vale_bid_price, vale_ask_price = None, None
@@ -80,7 +80,7 @@ def main_debug_print(message, see_bestprice):
     # important for you!
     if message["type"] == "close":
         print("The round has ended")
-        break
+        return True
     elif message["type"] == "error":
         print(message)
     elif message["type"] == "reject":
@@ -108,6 +108,7 @@ def main_debug_print(message, see_bestprice):
                             "vale_ask_price": vale_ask_price,
                         }
                     )
+    return False
 
 
 # ~~~~~============== PROVIDED CODE ==============~~~~~
