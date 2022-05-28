@@ -29,8 +29,8 @@ def main():
     timer_bond = Delaytimer(0.01)
     valbz_bid_price = None
     valbz_ask_price = None
-    vale_bid_price = None
-    vale_ask_price = None
+    buy_id = None
+    sell_id = None
     while True:
         message = exchange.read_message()
         bookdata_update(bookdata, message)
@@ -56,33 +56,45 @@ def main():
 
                 valbz_bid_price = best_price("buy")
                 valbz_ask_price = best_price("sell")
+            valbz_fairvalue = (valbz_bid_price + valbz_ask_price) // 2
+            if buy_id!=None and sell_id!=None:
 
+                exchange.send_cancel_message(order_id=buy_id)
+                exchange.send_cancel_message(order_id=sell_id)
 
+            order_id += 1
+            exchange.send_add_message(order_id=order_id, symbol="VALE",
+             dir=Dir.SELL, price=valbz_fairvalue+1, size=1)
+            sell_id = order_id
+            order_id += 1
+            buy_id = order_id
+            exchange.send_add_message(order_id=order_id, symbol="VALE",
+             dir=Dir.BUY, price=valbz_fairvalue-1, size=1)
 
-
-            if (valbz_bid_price!=None and valbz_ask_price!=None and
-            message["type"] == "book" and message["symbol"] == "VALE"):
-
-                def best_price(side):
-                    if message[side]:
-                        return message[side][0][0]
-
-                vale_bid_price = best_price("buy")
-                vale_ask_price = best_price("sell")
-
-
-                valbz_fairvalue = (valbz_bid_price + valbz_ask_price) // 2
-                if (vale_bid_price!=None and vale_ask_price!=None):
-                    # sell at high bid price
-                    if vale_bid_price > valbz_fairvalue:
-                        order_id += 1
-                        exchange.send_add_message(order_id=order_id, symbol="VALE",
-                         dir=Dir.SELL, price=vale_bid_price, size=1)
-                    # buy at low bid price
-                    if vale_ask_price < valbz_fairvalue:
-                        order_id += 1
-                        exchange.send_add_message(order_id=order_id, symbol="VALE",
-                         dir=Dir.BUY, price=vale_ask_price, size=1)
+            #
+            # if (valbz_bid_price!=None and valbz_ask_price!=None and
+            # message["type"] == "book" and message["symbol"] == "VALE"):
+            #
+            #     def best_price(side):
+            #         if message[side]:
+            #             return message[side][0][0]
+            #
+            #     vale_bid_price = best_price("buy")
+            #     vale_ask_price = best_price("sell")
+            #
+            #
+            #     valbz_fairvalue = (valbz_bid_price + valbz_ask_price) // 2
+            #     if (vale_bid_price!=None and vale_ask_price!=None):
+            #         # sell at high bid price
+            #         if vale_bid_price > valbz_fairvalue:
+            #             order_id += 1
+            #             exchange.send_add_message(order_id=order_id, symbol="VALE",
+            #              dir=Dir.SELL, price=vale_bid_price, size=1)
+            #         # buy at low bid price
+            #         if vale_ask_price < valbz_fairvalue:
+            #             order_id += 1
+            #             exchange.send_add_message(order_id=order_id, symbol="VALE",
+            #              dir=Dir.BUY, price=vale_ask_price, size=1)
 
 
 
@@ -96,9 +108,9 @@ def main():
 def positions_update(positions: dict, message: dict):
     if message["type"] == "fill":
         if message["dir"] == "BUY":
-            positions[message["symbol"]] += message["size"]
+            positions[message["symbol"]] += message["size"] # increase number positions
         elif message["dir"] == "SELL":
-            positions[message["symbol"]] -= message["size"]
+            positions[message["symbol"]] -= message["size"] # decrease number positions
         # print("positions: ", positions)
 
 def bookdata_update(bookdata: dict, message: dict):
@@ -107,7 +119,7 @@ def bookdata_update(bookdata: dict, message: dict):
             bookdata[message["symbol"]]["buy"] = message["buy"][0] # get best bid
         if message["sell"]:
             bookdata[message["symbol"]]["sell"] = message["sell"][0] # get best ask
-        print("bookdata: ", bookdata)
+        # print("bookdata: ", bookdata)
 
 class Delaytimer:
     def __init__(self, delay):
