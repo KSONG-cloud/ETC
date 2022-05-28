@@ -29,6 +29,7 @@ def main():
 
     while True:
         message = exchange.read_message()
+        positions_update(positions, message)
 
         if timer_bond.update():
             # Penny Pinching
@@ -107,13 +108,14 @@ def main():
                 print("The round has ended")
                 break
 
-def positions_update(positions: defaultdict, message: dict):
+def positions_update(positions: dict, message: dict):
+    print(message["type"])
     if message["type"] == "fill":
         if message["dir"] == "BUY":
             positions[message["symbol"]] += message["size"]
         elif message["dir"] == "SELL":
             positions[message["symbol"]] -= message["size"]
-    print("positions: ", positions)
+        print("positions: ", positions)
 
 class Delaytimer:
     def __init__(self, delay):
