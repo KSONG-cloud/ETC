@@ -85,7 +85,7 @@ def ADR_balance(exchange, safeguard = 5):
          dir=Dir.BUY, price=bookdata["VALE"]["sell"][0], size=-positions["VALE"]-safeguard)
         exchange.send_cancel_message(order_id=orderid)
 
-def XLF_trade(exchange, margin=1):
+def XLF_trade(exchange, margin=5):
     global orderid
     weights = [3, 2, 3, 2]
     n = sum(weights)
@@ -93,7 +93,7 @@ def XLF_trade(exchange, margin=1):
     if None in prices:
         print("There is a None here!")
         return
-    fairvalue = sum(prices[i]*weights[i]/n for i in range(4))
+    fairvalue = int(sum(prices[i]*weights[i]/n for i in range(4)))
 
     print("Fair value:",fairvalue, bookdata["XLF"])
     orderid += 1
