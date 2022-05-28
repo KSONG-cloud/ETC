@@ -36,9 +36,9 @@ def main():
 
             # Penny Pinching
             order_id += 1
-            exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.BUY, price=999, size=10)
+            exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.BUY, price=999, size=1)
             order_id += 1
-            exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.SELL, price=1001, size=10)
+            exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
 
             # main_debug_print(message, see_bestprice = False)
             if message["type"] == "close":
