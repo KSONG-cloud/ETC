@@ -10,8 +10,10 @@ import json
 team_name = "TABLETURNERS"
 
 # global variables
-positions = defaultdict(int)
-securities = ['BOND', 'VALBZ', 'VALE', 'GS', 'MS', 'WFC', 'XLF']
+# positions = defaultdict(int)
+# for key in ['BOND', 'VALBZ', 'VALE', 'GS', 'MS', 'WFC', 'XLF']: positions[key] = 0
+positions = {s : 0 for s in ['BOND', 'VALBZ', 'VALE', 'GS', 'MS', 'WFC', 'XLF']}
+
 
 def main():
     # Setup
@@ -42,6 +44,62 @@ def main():
             exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
 
             # Modeling ADR with share
+            if message["type"] == "book" and message["symbol"] == "VALBZ":
+
+                def best_price(side):
+                    if message[side]:
+                        return message[side][0][0]
+
+
+                valbz_bid_price = best_price("buy")
+                valbz_ask_price = best_price("sell")
+
+                now = time.time()
+
+                # if now > vale_last_print_time + 1:
+                #     vale_last_print_time = now
+                #     if see_bestprice:
+                #         print(
+                #             {
+                #                 "vale_bid_price": vale_bid_price,
+                #                 "vale_ask_price": vale_ask_price,
+                #             }
+                #         )
+
+
+            if message["type"] == "book" and message["symbol"] == "VALE":
+
+                def best_price(side):
+                    if message[side]:
+                        return message[side][0][0]
+
+                vale_bid_price = best_price("buy")
+                vale_ask_price = best_price("sell")
+
+
+                now = time.time()
+                valbz_fairvalue = (valbz_bid_price + valbz_ask_price) // 2
+
+                # sell at high bid price
+                if vale_bid_price > valbz_fairvalue:
+                    order_id += 1
+                    exchange.send_add_message(order_id=order_id, symbol="VALE",
+                     dir=Dir.SELL, price=vale_bid_price, size=1)
+                # buy at low bid price
+                if vale_ask_price < valbz_fairvalue:
+                    order_id += 1
+                    exchange.send_add_message(order_id=order_id, symbol="VALE",
+                     dir=Dir.BUY, price=vale_ask_price, size=1)
+                # if now > vale_last_print_time + 1:
+                #     vale_last_print_time = now
+                #     if see_bestprice:
+                #         print(
+                #             {
+                #                 "vale_bid_price": vale_bid_price,
+                #                 "vale_ask_price": vale_ask_price,
+                #             }
+                #         )
+
 
 
 
@@ -52,7 +110,16 @@ def main():
 
 def positions_update(dict, message):
     if message["type"] == "fill":
-        return
+        if message["dir"] == "BUY":
+            dict[message["symbol"]] += message["size"]
+        elif message["dir"] == "SELL":
+            dict[message["symbol"]] -= message["size"]
+    print("positions: " + dict)
+
+class Delaytimer:
+    def __init__(self):
+        self.delay = 100
+        self.wait_until = time.time() + self.delay
 
 def main_debug_print(message, see_bestprice):
     vale_bid_price, vale_ask_price = None, None
