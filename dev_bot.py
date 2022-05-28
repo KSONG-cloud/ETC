@@ -36,10 +36,10 @@ def main():
 
         if timer_bond.update():
             # Penny Pinching on BONDS
-            orderid += 1
-            exchange.send_add_message(order_id=orderid, symbol="BOND", dir=Dir.BUY, price=999, size=1)
-            orderid += 1
-            exchange.send_add_message(order_id=orderid, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
+            # orderid += 1
+            # exchange.send_add_message(order_id=orderid, symbol="BOND", dir=Dir.BUY, price=999, size=1)
+            # orderid += 1
+            # exchange.send_add_message(order_id=orderid, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
 
             # Penny Pinching on ADR
             ADR_trade(exchange)
