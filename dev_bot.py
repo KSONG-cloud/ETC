@@ -11,8 +11,9 @@ team_name = "TABLETURNERS"
 
 # global variables
 # positions = defaultdict(int)
-# for key in ['BOND', 'VALBZ', 'VALE', 'GS', 'MS', 'WFC', 'XLF']: positions[key] = 0
-positions = {s : 0 for s in ['BOND', 'VALBZ', 'VALE', 'GS', 'MS', 'WFC', 'XLF']}
+symbols = ['BOND', 'VALBZ', 'VALE', 'GS', 'MS', 'WFC', 'XLF']
+bookdata = {s : {'sell': None, 'buy': None} for s in symbols}
+positions = {s : 0 for s in symbols}
 
 
 def main():
@@ -26,9 +27,13 @@ def main():
 
     order_id = 0
     timer_bond = Delaytimer(0.01)
-
+    valbz_bid_price = None
+    valbz_ask_price = None
+    vale_bid_price = None
+    vale_ask_price = None
     while True:
         message = exchange.read_message()
+        bookdata_update(bookdata, message)
         positions_update(positions, message)
 
         if timer_bond.update():
@@ -39,10 +44,9 @@ def main():
             exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
 
             # Modeling ADR with share
-            valbz_bid_price = None
-            valbz_ask_price = None
-            vale_bid_price = None
-            vale_ask_price = None
+
+            if message["type"] == "book":
+                print("message:",message)
             if message["type"] == "book" and message["symbol"] == "VALBZ":
 
                 def best_price(side):
@@ -114,7 +118,13 @@ def positions_update(positions: dict, message: dict):
             positions[message["symbol"]] += message["size"]
         elif message["dir"] == "SELL":
             positions[message["symbol"]] -= message["size"]
-        print("positions: ", positions)
+        # print("positions: ", positions)
+
+def bookdata_update(bookdata: dict, message: dict):
+    if message["type"] == "book":
+        bookdata[message["symbol"]]["buy"] = message["buy"][0] # get best bid
+        bookdata[message["symbol"]]["sell"] = message["sell"][0] # get best ask
+        print("bookdata: ", bookdata)
 
 class Delaytimer:
     def __init__(self, delay):
