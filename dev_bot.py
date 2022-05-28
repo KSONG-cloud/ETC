@@ -15,7 +15,6 @@ symbols = ['BOND', 'VALBZ', 'VALE', 'GS', 'MS', 'WFC', 'XLF']
 bookdata = {s : {'sell': None, 'buy': None} for s in symbols}
 positions = {s : 0 for s in symbols}
 
-
 def main():
     # Setup
     args = parse_arguments()
@@ -27,10 +26,6 @@ def main():
 
     order_id = 0
     timer_bond = Delaytimer(0.01)
-    valbz_bid_price = None
-    valbz_ask_price = None
-    buy_id = None
-    sell_id = None
     while True:
         message = exchange.read_message()
         bookdata_update(bookdata, message)
@@ -61,20 +56,15 @@ def main():
             if valbz_bid_price!=None and valbz_ask_price!=None:
                 valbz_fairvalue = (valbz_bid_price + valbz_ask_price) // 2
 
-                if buy_id!=None and sell_id!=None:
-                    exchange.send_cancel_message(order_id=buy_id)
-                    exchange.send_cancel_message(order_id=sell_id)
-
                 order_id += 1
-                sell_id = order_id
                 exchange.send_add_message(order_id=order_id, symbol="VALE",
                  dir=Dir.SELL, price=valbz_fairvalue+1, size=1)
+                exchange.send_cancel_message(order_id=order_id)
 
                 order_id += 1
-                buy_id = order_id
                 exchange.send_add_message(order_id=order_id, symbol="VALE",
                  dir=Dir.BUY, price=valbz_fairvalue-1, size=1)
-
+                exchange.send_cancel_message(order_id=order_id)
             #
             # if (valbz_bid_price!=None and valbz_ask_price!=None and
             # message["type"] == "book" and message["symbol"] == "VALE"):
@@ -99,10 +89,6 @@ def main():
             #             order_id += 1
             #             exchange.send_add_message(order_id=order_id, symbol="VALE",
             #              dir=Dir.BUY, price=vale_ask_price, size=1)
-
-
-
-
 
             # main_debug_print(message, see_bestprice = False)
             if message["type"] == "close":
