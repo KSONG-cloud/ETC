@@ -28,7 +28,7 @@ def main():
 
     while True:
         message = exchange.read_message()
-        if message["type"] == "book": print("message recieved:", message)
+        if message["type"] == "fill": print("message recieved:", message)
 
         if wait_until < time.time():
             wait_until = time.time() + wait_time
