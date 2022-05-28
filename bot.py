@@ -43,10 +43,11 @@ def main():
             # orderid += 1
             # exchange.send_add_message(order_id=orderid, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
             pass
-            
+
         if timer_ADR.update():
             # Penny Pinching on ADR
-            ADR_trade(exchange)
+            # ADR_trade(exchange)
+            pass
 
         if timer_XLF.update():
             # Penny Pinching on XLF
