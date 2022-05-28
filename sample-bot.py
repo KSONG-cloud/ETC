@@ -60,12 +60,14 @@ def main():
     # message. Sending a message in response to every exchange message will
     # cause a feedback loop where your bot's messages will quickly be
     # rate-limited and ignored. Please, don't do that!
+    timer = 0
     while True:
+        timer += 1
         message = exchange.read_message()
-
+        if (timer%10)==0:
         # Penny Pinching
-        exchange.send_add_message(order_id=1, symbol="BOND", dir=Dir.BUY, price=999, size=5)
-        exchange.send_add_message(order_id=2, symbol="BOND", dir=Dir.SELL, price=1001, size=5)
+            exchange.send_add_message(order_id=1, symbol="BOND", dir=Dir.BUY, price=999, size=5)
+            exchange.send_add_message(order_id=2, symbol="BOND", dir=Dir.SELL, price=1001, size=5)
 
         if main_debug_print(message, see_bestprice = False): break
 
