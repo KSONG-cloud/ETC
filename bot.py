@@ -19,8 +19,9 @@ def main():
     print("First message from exchange:", hello_message)
 
     order_id = 0
-    wait = 100
+    wait = 0.01
     waituntil = time.time() + wait
+
     while True:
         if waituntil < time.time():
             waituntil = time.time() + wait
