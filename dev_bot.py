@@ -14,9 +14,10 @@ team_name = "TABLETURNERS"
 symbols = ['BOND', 'VALBZ', 'VALE', 'GS', 'MS', 'WFC', 'XLF']
 bookdata = {s : {'sell': None, 'buy': None} for s in symbols}
 positions = {s : 0 for s in symbols}
-order_id = 0
+orderid = 0
 
 def main():
+
     # Setup
     args = parse_arguments()
     exchange = ExchangeConnection(args=args)
@@ -34,10 +35,10 @@ def main():
 
         if timer_bond.update():
             # Penny Pinching on BONDS
-            order_id += 1
-            exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.BUY, price=999, size=1)
-            order_id += 1
-            exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
+            orderid += 1
+            exchange.send_add_message(order_id=orderid, symbol="BOND", dir=Dir.BUY, price=999, size=1)
+            orderid += 1
+            exchange.send_add_message(order_id=orderid, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
 
             # Penny Pinching on ADR
             ADR_trade()
@@ -56,27 +57,27 @@ def ADR_trade(margin=1):
     if valbz_bid_price!=None and valbz_ask_price!=None:
         valbz_fairvalue = (valbz_bid_price + valbz_ask_price) // 2
 
-        order_id += 1
-        exchange.send_add_message(order_id=order_id, symbol="VALE",
+        orderid += 1
+        exchange.send_add_message(order_id=orderid, symbol="VALE",
          dir=Dir.SELL, price=valbz_fairvalue+margin, size=1)
-        exchange.send_cancel_message(order_id=order_id)
+        exchange.send_cancel_message(order_id=orderid)
 
-        order_id += 1
-        exchange.send_add_message(order_id=order_id, symbol="VALE",
+        orderid += 1
+        exchange.send_add_message(order_id=orderid, symbol="VALE",
          dir=Dir.BUY, price=valbz_fairvalue-margin, size=1)
-        exchange.send_cancel_message(order_id=order_id)
+        exchange.send_cancel_message(order_id=orderid)
 
 def ADR_balance(safeguard = 5):
     if positions["VALE"]>safeguard:
-        order_id += 1
-        exchange.send_add_message(order_id=order_id, symbol="VALE",
+        orderid += 1
+        exchange.send_add_message(order_id=orderid, symbol="VALE",
          dir=Dir.SELL, price=bookdata["VALE"]["buy"][0], size=positions["VALE"]-safeguard)
-        exchange.send_cancel_message(order_id=order_id)
+        exchange.send_cancel_message(order_id=orderid)
     elif positions["VALE"]<-safeguard:
-        order_id += 1
-        exchange.send_add_message(order_id=order_id, symbol="VALE",
+        orderid += 1
+        exchange.send_add_message(order_id=orderid, symbol="VALE",
          dir=Dir.BUY, price=bookdata["VALE"]["sell"][0], size=-positions["VALE"]-safeguard)
-        exchange.send_cancel_message(order_id=order_id)
+        exchange.send_cancel_message(order_id=orderid)
 
 def positions_update(positions: dict, message: dict):
     if message["type"] == "fill":
