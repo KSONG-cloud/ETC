@@ -82,6 +82,43 @@ def ADR_balance(exchange, safeguard = 5):
          dir=Dir.BUY, price=bookdata["VALE"]["sell"][0], size=-positions["VALE"]-safeguard)
         exchange.send_cancel_message(order_id=orderid)
 
+def XLF_trade(exchange, margin=5):
+    global orderid
+    weights = [3, 2, 3, 2]
+    n = sum(weights)
+    prices = [1000]+list(bookdata_price_average(s) for s in ['GS', 'MS', 'WFC'])
+    fairvalue = sum(prices[i]*weights[i]/n for i in range(4))
+
+    orderid += 1
+    exchange.send_add_message(order_id=orderid, symbol="XLF",
+     dir=Dir.SELL, price=fairvalue+margin, size=10)
+    exchange.send_cancel_message(order_id=orderid)
+
+    orderid += 1
+    exchange.send_add_message(order_id=orderid, symbol="XLF",
+     dir=Dir.BUY, price=fairvalue-margin, size=10)
+    exchange.send_cancel_message(order_id=orderid)
+
+def XLF_balance(exchange, safeguard = 5):
+    global orderid
+    # if positions["VALE"]>safeguard:
+    #     orderid += 1
+    #     exchange.send_add_message(order_id=orderid, symbol="VALE",
+    #      dir=Dir.SELL, price=bookdata["VALE"]["buy"][0], size=positions["VALE"]-safeguard)
+    #     exchange.send_cancel_message(order_id=orderid)
+    # elif positions["VALE"]<-safeguard:
+    #     orderid += 1
+    #     exchange.send_add_message(order_id=orderid, symbol="VALE",
+    #      dir=Dir.BUY, price=bookdata["VALE"]["sell"][0], size=-positions["VALE"]-safeguard)
+    #     exchange.send_cancel_message(order_id=orderid)
+
+def bookdata_price_average(symbol):
+    bid_price = bookdata[symbol]["buy"][0]
+    ask_price = bookdata[symbol]["sell"][0]
+    if bid_price!=None and ask_price!=None:
+        return (valbz_bid_price + valbz_ask_price) // 2
+    return None
+
 def positions_update(positions: dict, message: dict):
     if message["type"] == "fill":
         if message["dir"] == "BUY":
