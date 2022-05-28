@@ -57,20 +57,10 @@ def main():
                 valbz_bid_price = best_price("buy")
                 valbz_ask_price = best_price("sell")
 
-                # now = time.time()
-
-                # if now > vale_last_print_time + 1:
-                #     vale_last_print_time = now
-                #     if see_bestprice:
-                #         print(
-                #             {
-                #                 "vale_bid_price": vale_bid_price,
-                #                 "vale_ask_price": vale_ask_price,
-                #             }
-                #         )
 
 
-            if (valbz_bid_price!=None and
+
+            if (valbz_bid_price!=None and valbz_ask_price!=None
             message["type"] == "book" and message["symbol"] == "VALE"):
 
                 def best_price(side):
@@ -81,28 +71,19 @@ def main():
                 vale_ask_price = best_price("sell")
 
 
-                # now = time.time()
                 valbz_fairvalue = (valbz_bid_price + valbz_ask_price) // 2
+                if (vale_bid_price!=None and vale_ask_price!=None):
+                    # sell at high bid price
+                    if vale_bid_price > valbz_fairvalue:
+                        order_id += 1
+                        exchange.send_add_message(order_id=order_id, symbol="VALE",
+                         dir=Dir.SELL, price=vale_bid_price, size=1)
+                    # buy at low bid price
+                    if vale_ask_price < valbz_fairvalue:
+                        order_id += 1
+                        exchange.send_add_message(order_id=order_id, symbol="VALE",
+                         dir=Dir.BUY, price=vale_ask_price, size=1)
 
-                # sell at high bid price
-                if vale_bid_price > valbz_fairvalue:
-                    order_id += 1
-                    exchange.send_add_message(order_id=order_id, symbol="VALE",
-                     dir=Dir.SELL, price=vale_bid_price, size=1)
-                # buy at low bid price
-                if vale_ask_price < valbz_fairvalue:
-                    order_id += 1
-                    exchange.send_add_message(order_id=order_id, symbol="VALE",
-                     dir=Dir.BUY, price=vale_ask_price, size=1)
-                # if now > vale_last_print_time + 1:
-                #     vale_last_print_time = now
-                #     if see_bestprice:
-                #         print(
-                #             {
-                #                 "vale_bid_price": vale_bid_price,
-                #                 "vale_ask_price": vale_ask_price,
-                #             }
-                #         )
 
 
 
