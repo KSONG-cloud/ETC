@@ -21,14 +21,16 @@ def main():
     order_id = 0
     waituntil = time.time() + 100
     while True:
-        timestamp_current = time.time()
-        if waituntil < timestamp_current:
-            waituntil = timestamp_current
+        if waituntil < time.time():
+            waituntil = time.time()
             message = exchange.read_message()
 
+
             # Penny Pinching
-            exchange.send_add_message(order_id=order_id+=1, symbol="BOND", dir=Dir.BUY, price=999, size=5)
-            exchange.send_add_message(order_id=order_id+=1, symbol="BOND", dir=Dir.SELL, price=1001, size=5)
+            order_id += 1
+            exchange.send_add_message(order_id, symbol="BOND", dir=Dir.BUY, price=999, size=5)
+            order_id += 1
+            exchange.send_add_message(order_id, symbol="BOND", dir=Dir.SELL, price=1001, size=5)
 
             if main_debug_print(message, see_bestprice = False): break
 
