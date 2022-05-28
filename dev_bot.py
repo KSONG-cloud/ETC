@@ -14,6 +14,7 @@ team_name = "TABLETURNERS"
 symbols = ['BOND', 'VALBZ', 'VALE', 'GS', 'MS', 'WFC', 'XLF']
 bookdata = {s : {'sell': None, 'buy': None} for s in symbols}
 positions = {s : 0 for s in symbols}
+order_id = 0
 
 def main():
     # Setup
@@ -24,42 +25,58 @@ def main():
     hello_message = exchange.read_message()
     print("First message from exchange:", hello_message)
 
-    order_id = 0
     timer_bond = Delaytimer(0.01)
+    timer_balance = Delaytimer(1)
     while True:
         message = exchange.read_message()
         bookdata_update(bookdata, message)
         positions_update(positions, message)
 
         if timer_bond.update():
-            # Penny Pinching
+            # Penny Pinching on BONDS
             order_id += 1
             exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.BUY, price=999, size=1)
             order_id += 1
             exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
 
-            # Modeling ADR with share
-            valbz_bid_price = bookdata["VALBZ"]["buy"][0]
-            valbz_ask_price = bookdata["VALBZ"]["sell"][0]
-            if valbz_bid_price!=None and valbz_ask_price!=None:
-                valbz_fairvalue = (valbz_bid_price + valbz_ask_price) // 2
+            # Penny Pinching on ADR
+            ADR_trade()
 
-                order_id += 1
-                exchange.send_add_message(order_id=order_id, symbol="VALE",
-                 dir=Dir.SELL, price=valbz_fairvalue+1, size=1)
-                exchange.send_cancel_message(order_id=order_id)
+        if timer_balance.update():
+            ADR_balance()
 
-                order_id += 1
-                exchange.send_add_message(order_id=order_id, symbol="VALE",
-                 dir=Dir.BUY, price=valbz_fairvalue-1, size=1)
-                exchange.send_cancel_message(order_id=order_id)
+        # main_debug_print(message, see_bestprice = False)
+        if message["type"] == "close":
+            print("The round has ended")
+            break
 
+def ADR_trade(margin=1):
+    valbz_bid_price = bookdata["VALBZ"]["buy"][0]
+    valbz_ask_price = bookdata["VALBZ"]["sell"][0]
+    if valbz_bid_price!=None and valbz_ask_price!=None:
+        valbz_fairvalue = (valbz_bid_price + valbz_ask_price) // 2
 
+        order_id += 1
+        exchange.send_add_message(order_id=order_id, symbol="VALE",
+         dir=Dir.SELL, price=valbz_fairvalue+margin, size=1)
+        exchange.send_cancel_message(order_id=order_id)
 
-            # main_debug_print(message, see_bestprice = False)
-            if message["type"] == "close":
-                print("The round has ended")
-                break
+        order_id += 1
+        exchange.send_add_message(order_id=order_id, symbol="VALE",
+         dir=Dir.BUY, price=valbz_fairvalue-margin, size=1)
+        exchange.send_cancel_message(order_id=order_id)
+
+def ADR_balance(safeguard = 5):
+    if positions["VALE"]>safeguard:
+        order_id += 1
+        exchange.send_add_message(order_id=order_id, symbol="VALE",
+         dir=Dir.SELL, price=bookdata["VALE"]["buy"][0], size=positions["VALE"]-safeguard)
+        exchange.send_cancel_message(order_id=order_id)
+    elif positions["VALE"]<-safeguard:
+        order_id += 1
+        exchange.send_add_message(order_id=order_id, symbol="VALE",
+         dir=Dir.BUY, price=bookdata["VALE"]["sell"][0], size=-positions["VALE"]-safeguard)
+        exchange.send_cancel_message(order_id=order_id)
 
 def positions_update(positions: dict, message: dict):
     if message["type"] == "fill":
