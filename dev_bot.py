@@ -67,7 +67,8 @@ def main():
                 #         )
 
 
-            if message["type"] == "book" and message["symbol"] == "VALE":
+            if (type(valbz_bid_price)!=None and
+            message["type"] == "book" and message["symbol"] == "VALE"):
 
                 def best_price(side):
                     if message[side]:
@@ -108,18 +109,25 @@ def main():
                 print("The round has ended")
                 break
 
-def positions_update(dict, message):
+def positions_update(positions: defaultdict, message: dict):
     if message["type"] == "fill":
         if message["dir"] == "BUY":
-            dict[message["symbol"]] += message["size"]
+            positions[message["symbol"]] += message["size"]
         elif message["dir"] == "SELL":
-            dict[message["symbol"]] -= message["size"]
+            positions[message["symbol"]] -= message["size"]
     print("positions: " + dict)
 
 class Delaytimer:
     def __init__(self):
         self.delay = 100
         self.wait_until = time.time() + self.delay
+
+
+    def update(self):
+        if self.wait_until < time.time():
+            self.wait_until = time.time() + self.wait_time
+            return True
+        return False
 
 def main_debug_print(message, see_bestprice):
     vale_bid_price, vale_ask_price = None, None
