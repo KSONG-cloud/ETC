@@ -6,7 +6,7 @@ from enum import Enum
 import time
 import socket
 import json
-import defaultdict()
+import defaultdict
 
 team_name = "TABLETURNERS"
 
