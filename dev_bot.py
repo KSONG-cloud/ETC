@@ -122,8 +122,10 @@ def positions_update(positions: dict, message: dict):
 
 def bookdata_update(bookdata: dict, message: dict):
     if message["type"] == "book":
-        bookdata[message["symbol"]]["buy"] = message["buy"][0] # get best bid
-        bookdata[message["symbol"]]["sell"] = message["sell"][0] # get best ask
+        if message["buy"]:
+            bookdata[message["symbol"]]["buy"] = message["buy"][0] # get best bid
+        if message["sell"]:
+            bookdata[message["symbol"]]["sell"] = message["sell"][0] # get best ask
         print("bookdata: ", bookdata)
 
 class Delaytimer:
