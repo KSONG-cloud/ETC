@@ -47,6 +47,7 @@ def main():
         if timer_ADR.update():
             # Penny Pinching on ADR
             # ADR_trade(exchange)
+            pass
 
         if timer_XLF.update():
             # Penny Pinching on XLF
