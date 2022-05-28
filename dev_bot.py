@@ -28,7 +28,9 @@ def main():
 
     while True:
         message = exchange.read_message()
-        if message["type"] == "fill": print("message recieved:", message)
+        if message["type"] == "fill":
+            print("message recieved:", message)
+            if message["dir"] == "BUY": print('test')
 
         if wait_until < time.time():
             wait_until = time.time() + wait_time
@@ -39,13 +41,18 @@ def main():
             order_id += 1
             exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
 
+            # Modeling ADR with share
+
+
+
             # main_debug_print(message, see_bestprice = False)
             if message["type"] == "close":
                 print("The round has ended")
                 break
 
 def positions_update(dict, message):
-    return
+    if message["type"] == "fill":
+        return
 
 def main_debug_print(message, see_bestprice):
     vale_bid_price, vale_ask_price = None, None
