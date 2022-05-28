@@ -27,8 +27,9 @@ def main():
     hello_message = exchange.read_message()
     print("First message from exchange:", hello_message)
 
-    timer_penny = Delaytimer(0.05)
-    timer_offer = Delaytimer(0.01)
+    timer_penny = Delaytimer(0.01, 0.006)
+    timer_ADR = Delaytimer(0.01, 0.005)
+    timer_XLF = Delaytimer(0.01, 0)
     timer_balance = Delaytimer(1)
     while True:
         message = exchange.read_message()
@@ -37,15 +38,17 @@ def main():
 
         if timer_penny.update():
             # Penny Pinching on BONDS
-            orderid += 1
-            exchange.send_add_message(order_id=orderid, symbol="BOND", dir=Dir.BUY, price=999, size=1)
-            orderid += 1
-            exchange.send_add_message(order_id=orderid, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
-
-        if timer_offer.update():
+            # orderid += 1
+            # exchange.send_add_message(order_id=orderid, symbol="BOND", dir=Dir.BUY, price=999, size=1)
+            # orderid += 1
+            # exchange.send_add_message(order_id=orderid, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
+            pass
+            
+        if timer_ADR.update():
             # Penny Pinching on ADR
             ADR_trade(exchange)
 
+        if timer_XLF.update():
             # Penny Pinching on XLF
             XLF_trade(exchange)
 
@@ -146,9 +149,9 @@ def bookdata_update(bookdata: dict, message: dict):
         # print("bookdata: ", bookdata)
 
 class Delaytimer:
-    def __init__(self, delay):
+    def __init__(self, delay, offset = 0):
         self.delay = delay
-        self.wait_until = time.time() + self.delay
+        self.wait_until = time.time() + self.delay+offset
 
     def update(self):
         if self.wait_until < time.time():
