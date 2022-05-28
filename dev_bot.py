@@ -42,17 +42,17 @@ def main():
             exchange.send_add_message(order_id=orderid, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
 
             # Penny Pinching on ADR
-            ADR_trade()
+            ADR_trade(exchange)
 
         if timer_balance.update():
-            ADR_balance()
+            ADR_balance(exchange)
 
         # main_debug_print(message, see_bestprice = False)
         if message["type"] == "close":
             print("The round has ended")
             break
 
-def ADR_trade(margin=1):
+def ADR_trade(exchange, margin=1):
     global orderid
     valbz_bid_price = bookdata["VALBZ"]["buy"][0]
     valbz_ask_price = bookdata["VALBZ"]["sell"][0]
@@ -69,7 +69,7 @@ def ADR_trade(margin=1):
          dir=Dir.BUY, price=valbz_fairvalue-margin, size=1)
         exchange.send_cancel_message(order_id=orderid)
 
-def ADR_balance(safeguard = 5):
+def ADR_balance(exchange, safeguard = 5):
     global orderid
     if positions["VALE"]>safeguard:
         orderid += 1
