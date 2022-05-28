@@ -52,7 +52,7 @@ def main():
                 valbz_bid_price = best_price("buy")
                 valbz_ask_price = best_price("sell")
 
-                now = time.time()
+                # now = time.time()
 
                 # if now > vale_last_print_time + 1:
                 #     vale_last_print_time = now
@@ -76,7 +76,7 @@ def main():
                 vale_ask_price = best_price("sell")
 
 
-                now = time.time()
+                # now = time.time()
                 valbz_fairvalue = (valbz_bid_price + valbz_ask_price) // 2
 
                 # sell at high bid price
@@ -121,6 +121,7 @@ class Delaytimer:
         self.wait_until = time.time() + self.delay
 
     def update(self):
+        print(self)
         if self.wait_until < time.time():
             self.wait_until = time.time() + self.delay
             return True
