@@ -94,6 +94,8 @@ def XLF_trade(exchange, margin=5):
         print("There is a None here!")
         return
     fairvalue = sum(prices[i]*weights[i]/n for i in range(4))
+
+    print("Fair value:",fairvalue, bookdata["XLF"])
     orderid += 1
     exchange.send_add_message(order_id=orderid, symbol="XLF",
      dir=Dir.SELL, price=fairvalue+margin, size=10)
