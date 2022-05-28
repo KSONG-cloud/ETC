@@ -28,7 +28,7 @@ def main():
     print("First message from exchange:", hello_message)
 
     timer_penny = Delaytimer(0.01, 0.006)
-    timer_ADR = Delaytimer(0.01, 0.003)
+    timer_ADR = Delaytimer(0.01, 0.005)
     timer_XLF = Delaytimer(0.01, 0)
     timer_balance = Delaytimer(1)
     while True:
@@ -38,10 +38,10 @@ def main():
 
         if timer_penny.update():
             # Penny Pinching on BONDS
-            orderid += 1
-            exchange.send_add_message(order_id=orderid, symbol="BOND", dir=Dir.BUY, price=999, size=1)
-            orderid += 1
-            exchange.send_add_message(order_id=orderid, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
+            # orderid += 1
+            # exchange.send_add_message(order_id=orderid, symbol="BOND", dir=Dir.BUY, price=999, size=1)
+            # orderid += 1
+            # exchange.send_add_message(order_id=orderid, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
 
         if timer_ADR.update():
             # Penny Pinching on ADR
