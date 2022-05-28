@@ -99,12 +99,12 @@ def XLF_trade(exchange, margin=1):
     orderid += 1
     exchange.send_add_message(order_id=orderid, symbol="XLF",
      dir=Dir.SELL, price=fairvalue+margin, size=1)
-    exchange.send_cancel_message(order_id=orderid)
+    #exchange.send_cancel_message(order_id=orderid)
 
     orderid += 1
     exchange.send_add_message(order_id=orderid, symbol="XLF",
      dir=Dir.BUY, price=fairvalue-margin, size=1)
-    exchange.send_cancel_message(order_id=orderid)
+    #exchange.send_cancel_message(order_id=orderid)
 
 def XLF_balance(exchange, safeguard = 5):
     global orderid
