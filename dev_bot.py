@@ -27,6 +27,7 @@ def main():
     hello_message = exchange.read_message()
     print("First message from exchange:", hello_message)
 
+    timer_penny = Delaytimer(0.05)
     timer_offer = Delaytimer(0.01)
     timer_balance = Delaytimer(1)
     while True:
@@ -34,13 +35,14 @@ def main():
         bookdata_update(bookdata, message)
         positions_update(positions, message)
 
-        if timer_offer.update():
+        if timer_penny.update():
             # Penny Pinching on BONDS
             orderid += 1
             exchange.send_add_message(order_id=orderid, symbol="BOND", dir=Dir.BUY, price=999, size=1)
             orderid += 1
             exchange.send_add_message(order_id=orderid, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
 
+        if timer_offer.update():
             # Penny Pinching on ADR
             ADR_trade(exchange)
 
