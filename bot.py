@@ -10,8 +10,10 @@ import json
 team_name = "TABLETURNERS"
 
 # global variables
-positions = defaultdict(int)
-securities = ['BOND', 'VALBZ', 'VALE', 'GS', 'MS', 'WFC', 'XLF']
+# positions = defaultdict(int)
+symbols = ['BOND', 'VALBZ', 'VALE', 'GS', 'MS', 'WFC', 'XLF']
+bookdata = {s : {'sell': None, 'buy': None} for s in symbols}
+positions = {s : 0 for s in symbols}
 
 def main():
     # Setup
@@ -23,29 +25,68 @@ def main():
     print("First message from exchange:", hello_message)
 
     order_id = 0
-    wait_time = 0.01 #in seconds
-    wait_until = time.time() + wait_time
-
+    timer_bond = Delaytimer(0.01)
     while True:
         message = exchange.read_message()
-        if message["type"] == "fill": print("message recieved:", message)
+        bookdata_update(bookdata, message)
+        positions_update(positions, message)
 
-        if wait_until < time.time():
-            wait_until = time.time() + wait_time
-
+        if timer_bond.update():
             # Penny Pinching
             order_id += 1
             exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.BUY, price=999, size=1)
             order_id += 1
             exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
 
+            # Modeling ADR with share
+            valbz_bid_price = bookdata["VALBZ"]["buy"][0]
+            valbz_ask_price = bookdata["VALBZ"]["sell"][0]
+            if valbz_bid_price!=None and valbz_ask_price!=None:
+                valbz_fairvalue = (valbz_bid_price + valbz_ask_price) // 2
+
+                order_id += 1
+                exchange.send_add_message(order_id=order_id, symbol="VALE",
+                 dir=Dir.SELL, price=valbz_fairvalue+1, size=1)
+                exchange.send_cancel_message(order_id=order_id)
+
+                order_id += 1
+                exchange.send_add_message(order_id=order_id, symbol="VALE",
+                 dir=Dir.BUY, price=valbz_fairvalue-1, size=1)
+                exchange.send_cancel_message(order_id=order_id)
+
+
+
             # main_debug_print(message, see_bestprice = False)
             if message["type"] == "close":
                 print("The round has ended")
                 break
 
-def positions_update(dict, message):
-    return
+def positions_update(positions: dict, message: dict):
+    if message["type"] == "fill":
+        if message["dir"] == "BUY":
+            positions[message["symbol"]] += message["size"] # increase number positions
+        elif message["dir"] == "SELL":
+            positions[message["symbol"]] -= message["size"] # decrease number positions
+        # print("positions: ", positions)
+
+def bookdata_update(bookdata: dict, message: dict):
+    if message["type"] == "book":
+        if message["buy"]:
+            bookdata[message["symbol"]]["buy"] = message["buy"][0] # get best bid
+        if message["sell"]:
+            bookdata[message["symbol"]]["sell"] = message["sell"][0] # get best ask
+        # print("bookdata: ", bookdata)
+
+class Delaytimer:
+    def __init__(self, delay):
+        self.delay = delay
+        self.wait_until = time.time() + self.delay
+
+    def update(self):
+        if self.wait_until < time.time():
+            self.wait_until = time.time() + self.delay
+            return True
+        return False
 
 def main_debug_print(message, see_bestprice):
     vale_bid_price, vale_ask_price = None, None

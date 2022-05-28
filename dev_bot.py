@@ -33,24 +33,12 @@ def main():
 
         if timer_bond.update():
             # Penny Pinching
-            # order_id += 1
-            # exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.BUY, price=999, size=1)
-            # order_id += 1
-            # exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
+            order_id += 1
+            exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.BUY, price=999, size=1)
+            order_id += 1
+            exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
 
             # Modeling ADR with share
-
-            # if message["type"] == "book":
-            #     print("message:",message)
-            # if message["type"] == "book" and message["symbol"] == "VALBZ":
-            #
-            #     def best_price(side):
-            #         if message[side]:
-            #             return message[side][0][0]
-            #
-            #
-            #     valbz_bid_price = best_price("buy")
-            #     valbz_ask_price = best_price("sell")
             valbz_bid_price = bookdata["VALBZ"]["buy"][0]
             valbz_ask_price = bookdata["VALBZ"]["sell"][0]
             if valbz_bid_price!=None and valbz_ask_price!=None:
@@ -65,30 +53,8 @@ def main():
                 exchange.send_add_message(order_id=order_id, symbol="VALE",
                  dir=Dir.BUY, price=valbz_fairvalue-1, size=1)
                 exchange.send_cancel_message(order_id=order_id)
-            #
-            # if (valbz_bid_price!=None and valbz_ask_price!=None and
-            # message["type"] == "book" and message["symbol"] == "VALE"):
-            #
-            #     def best_price(side):
-            #         if message[side]:
-            #             return message[side][0][0]
-            #
-            #     vale_bid_price = best_price("buy")
-            #     vale_ask_price = best_price("sell")
-            #
-            #
-            #     valbz_fairvalue = (valbz_bid_price + valbz_ask_price) // 2
-            #     if (vale_bid_price!=None and vale_ask_price!=None):
-            #         # sell at high bid price
-            #         if vale_bid_price > valbz_fairvalue:
-            #             order_id += 1
-            #             exchange.send_add_message(order_id=order_id, symbol="VALE",
-            #              dir=Dir.SELL, price=vale_bid_price, size=1)
-            #         # buy at low bid price
-            #         if vale_ask_price < valbz_fairvalue:
-            #             order_id += 1
-            #             exchange.send_add_message(order_id=order_id, symbol="VALE",
-            #              dir=Dir.BUY, price=vale_ask_price, size=1)
+
+
 
             # main_debug_print(message, see_bestprice = False)
             if message["type"] == "close":
