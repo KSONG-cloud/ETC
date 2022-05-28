@@ -60,7 +60,7 @@ def main():
 
 
 
-            if (valbz_bid_price!=None and valbz_ask_price!=None
+            if (valbz_bid_price!=None and valbz_ask_price!=None and
             message["type"] == "book" and message["symbol"] == "VALE"):
 
                 def best_price(side):
