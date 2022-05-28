@@ -6,8 +6,13 @@ from enum import Enum
 import time
 import socket
 import json
+import defaultdict()
 
 team_name = "TABLETURNERS"
+
+# global variables
+positions = defaultdict(int)
+securities = ['BOND', 'VALBZ', 'VALE', 'GS', 'MS', 'WFC', 'XLF']
 
 def main():
     # Setup
@@ -19,21 +24,25 @@ def main():
     print("First message from exchange:", hello_message)
 
     order_id = 0
-    wait = 0.01
-    waituntil = time.time() + wait
+    wait_time = 0.01 #in seconds
+    wait_until = time.time() + wait_time
 
     while True:
-        if waituntil < time.time():
-            waituntil = time.time() + wait
-            message = exchange.read_message()
+        message = exchange.read_message()
+        if order_id = 0: print(message)
+
+        if wait_until < time.time():
+            wait_until = time.time() + wait_time
 
             # Penny Pinching
             order_id += 1
-            exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.BUY, price=999, size=5)
+            exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.BUY, price=999, size=10)
             order_id += 1
-            exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.SELL, price=1001, size=5)
-
+            exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.SELL, price=1001, size=10)
             if main_debug_print(message, see_bestprice = False): break
+
+def positions_update(dict, security, quantity):
+
 
 def main_debug_print(message, see_bestprice):
     vale_bid_price, vale_ask_price = None, None
