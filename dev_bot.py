@@ -25,8 +25,7 @@ def main():
     print("First message from exchange:", hello_message)
 
     order_id = 0
-    wait_time = 0.01 #in seconds
-    wait_until = time.time() + wait_time
+    timer_bond = Delaytimer(0.01)
 
     while True:
         message = exchange.read_message()
@@ -34,9 +33,7 @@ def main():
             print("message recieved:", message)
             if message["dir"] == "BUY": print('test')
 
-        if wait_until < time.time():
-            wait_until = time.time() + wait_time
-
+        if timer_bond.update():
             # Penny Pinching
             order_id += 1
             exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.BUY, price=999, size=1)
@@ -44,6 +41,10 @@ def main():
             exchange.send_add_message(order_id=order_id, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
 
             # Modeling ADR with share
+            valbz_bid_price = None
+            valbz_ask_price = None
+            vale_bid_price = None
+            vale_ask_price = None
             if message["type"] == "book" and message["symbol"] == "VALBZ":
 
                 def best_price(side):
@@ -121,7 +122,6 @@ class Delaytimer:
     def __init__(self, delay):
         self.delay = delay
         self.wait_until = time.time() + self.delay
-
 
     def update(self):
         if self.wait_until < time.time():
