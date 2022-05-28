@@ -109,7 +109,6 @@ def main():
                 break
 
 def positions_update(positions: dict, message: dict):
-    print(message["type"])
     if message["type"] == "fill":
         if message["dir"] == "BUY":
             positions[message["symbol"]] += message["size"]
