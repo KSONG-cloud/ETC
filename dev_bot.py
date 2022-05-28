@@ -115,17 +115,17 @@ def positions_update(positions: defaultdict, message: dict):
             positions[message["symbol"]] += message["size"]
         elif message["dir"] == "SELL":
             positions[message["symbol"]] -= message["size"]
-    print("positions: " + dict)
+    print("positions: ", positions)
 
 class Delaytimer:
-    def __init__(self):
-        self.delay = 100
+    def __init__(self, delay):
+        self.delay = delay
         self.wait_until = time.time() + self.delay
 
 
     def update(self):
         if self.wait_until < time.time():
-            self.wait_until = time.time() + self.wait_time
+            self.wait_until = time.time() + self.delay
             return True
         return False
 
