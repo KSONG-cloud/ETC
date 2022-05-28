@@ -49,8 +49,9 @@ def main():
 
         if timer_balance.update():
             ADR_balance(exchange)
+            XLF_balance(exchange)
 
-        main_debug_print(message, see_bestprice = False)
+        # main_debug_print(message, see_bestprice = False)
         if message["type"] == "close":
             print("The round has ended")
             break
@@ -85,7 +86,7 @@ def ADR_balance(exchange, safeguard = 5):
          dir=Dir.BUY, price=bookdata["VALE"]["sell"][0], size=-positions["VALE"]-safeguard)
         exchange.send_cancel_message(order_id=orderid)
 
-def XLF_trade(exchange, margin=5):
+def XLF_trade(exchange, margin=10):
     global orderid
     weights = [3, 2, 3, 2]
     n = sum(weights)
@@ -98,26 +99,26 @@ def XLF_trade(exchange, margin=5):
     print("Fair value:",fairvalue, bookdata["XLF"])
     orderid += 1
     exchange.send_add_message(order_id=orderid, symbol="XLF",
-     dir=Dir.SELL, price=fairvalue+margin, size=1)
+     dir=Dir.SELL, price=fairvalue+margin, size=10)
     exchange.send_cancel_message(order_id=orderid)
 
     orderid += 1
     exchange.send_add_message(order_id=orderid, symbol="XLF",
-     dir=Dir.BUY, price=fairvalue-margin, size=1)
+     dir=Dir.BUY, price=fairvalue-margin, size=10)
     exchange.send_cancel_message(order_id=orderid)
 
 def XLF_balance(exchange, safeguard = 5):
     global orderid
-    # if positions["VALE"]>safeguard:
-    #     orderid += 1
-    #     exchange.send_add_message(order_id=orderid, symbol="VALE",
-    #      dir=Dir.SELL, price=bookdata["VALE"]["buy"][0], size=positions["VALE"]-safeguard)
-    #     exchange.send_cancel_message(order_id=orderid)
-    # elif positions["VALE"]<-safeguard:
-    #     orderid += 1
-    #     exchange.send_add_message(order_id=orderid, symbol="VALE",
-    #      dir=Dir.BUY, price=bookdata["VALE"]["sell"][0], size=-positions["VALE"]-safeguard)
-    #     exchange.send_cancel_message(order_id=orderid)
+    if positions["XLF"]>safeguard:
+        orderid += 1
+        exchange.send_add_message(order_id=orderid, symbol="XLF",
+         dir=Dir.SELL, price=bookdata["VALE"]["buy"][0], size=positions["VALE"]-safeguard)
+        exchange.send_cancel_message(order_id=orderid)
+    elif positions["XLF"]<-safeguard:
+        orderid += 1
+        exchange.send_add_message(order_id=orderid, symbol="XLF",
+         dir=Dir.BUY, price=bookdata["VALE"]["sell"][0], size=-positions["VALE"]-safeguard)
+        exchange.send_cancel_message(order_id=orderid)
 
 def bookdata_price_average(symbol):
     bid_price = bookdata[symbol]["buy"][0]
