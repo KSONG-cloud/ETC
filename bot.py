@@ -46,7 +46,7 @@ def main():
                 break
 
 def positions_update(dict, security, quantity):
-
+    return
 
 def main_debug_print(message, see_bestprice):
     vale_bid_price, vale_ask_price = None, None
