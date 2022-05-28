@@ -36,10 +36,10 @@ def main():
 
         if timer_bond.update():
             # Penny Pinching on BONDS
-            # orderid += 1
-            # exchange.send_add_message(order_id=orderid, symbol="BOND", dir=Dir.BUY, price=999, size=1)
-            # orderid += 1
-            # exchange.send_add_message(order_id=orderid, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
+            orderid += 1
+            exchange.send_add_message(order_id=orderid, symbol="BOND", dir=Dir.BUY, price=999, size=1)
+            orderid += 1
+            exchange.send_add_message(order_id=orderid, symbol="BOND", dir=Dir.SELL, price=1001, size=1)
 
             # Penny Pinching on ADR
             ADR_trade(exchange)
@@ -52,7 +52,7 @@ def main():
             print("The round has ended")
             break
 
-def ADR_trade(exchange, margin=10):
+def ADR_trade(exchange, margin=5):
     global orderid
     valbz_bid_price = bookdata["VALBZ"]["buy"][0]
     valbz_ask_price = bookdata["VALBZ"]["sell"][0]
