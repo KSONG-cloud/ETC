@@ -52,7 +52,7 @@ def main():
             print("The round has ended")
             break
 
-def ADR_trade(exchange, margin=1):
+def ADR_trade(exchange, margin=10):
     global orderid
     valbz_bid_price = bookdata["VALBZ"]["buy"][0]
     valbz_ask_price = bookdata["VALBZ"]["sell"][0]
