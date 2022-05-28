@@ -13,7 +13,7 @@ import json
 
 # ~~~~~============== CONFIGURATION  ==============~~~~~
 # Replace "REPLACEME" with your team name!
-team_name = "REPLACEME"
+team_name = "TABLETURNERS"
 
 # ~~~~~============== MAIN LOOP ==============~~~~~
 
@@ -42,13 +42,11 @@ def main():
     # Send an order for BOND at a good price, but it is low enough that it is
     # unlikely it will be traded against. Maybe there is a better price to
     # pick? Also, you will need to send more orders over time.
-    exchange.send_add_message(order_id=1, symbol="BOND", dir=Dir.BUY, price=990, size=1)
-
+    # exchange.send_add_message(order_id=1, symbol="BOND", dir=Dir.BUY, price=999, size=5)
+    # exchange.send_add_message(order_id=1, symbol="BOND", dir=Dir.SELL, price=1001, size=5)
     # Set up some variables to track the bid and ask price of a symbol. Right
     # now this doesn't track much information, but it's enough to get a sense
     # of the VALE market.
-    vale_bid_price, vale_ask_price = None, None
-    vale_last_print_time = time.time()
 
     # Here is the main loop of the program. It will continue to read and
     # process messages in a loop until a "close" message is received. You
@@ -65,35 +63,45 @@ def main():
     while True:
         message = exchange.read_message()
 
-        # Some of the message types below happen infrequently and contain
-        # important information to help you understand what your bot is doing,
-        # so they are printed in full. We recommend not always printing every
-        # message because it can be a lot of information to read. Instead, let
-        # your code handle the messages and just print the information
-        # important for you!
-        if message["type"] == "close":
-            print("The round has ended")
-            break
-        elif message["type"] == "error":
-            print(message)
-        elif message["type"] == "reject":
-            print(message)
-        elif message["type"] == "fill":
-            print(message)
-        elif message["type"] == "book":
-            if message["symbol"] == "VALE":
+        # Penny Pinching
+        exchange.send_add_message(order_id=1, symbol="BOND", dir=Dir.BUY, price=999, size=5)
+        exchange.send_add_message(order_id=1, symbol="BOND", dir=Dir.SELL, price=1001, size=5)
 
-                def best_price(side):
-                    if message[side]:
-                        return message[side][0][0]
+        main_debug_print(message, see_bestprice = False)
 
-                vale_bid_price = best_price("buy")
-                vale_ask_price = best_price("sell")
+def main_debug_print(message, see_bestprice):
+    vale_bid_price, vale_ask_price = None, None
+    vale_last_print_time = time.time()
+    # Some of the message types below happen infrequently and contain
+    # important information to help you understand what your bot is doing,
+    # so they are printed in full. We recommend not always printing every
+    # message because it can be a lot of information to read. Instead, let
+    # your code handle the messages and just print the information
+    # important for you!
+    if message["type"] == "close":
+        print("The round has ended")
+        break
+    elif message["type"] == "error":
+        print(message)
+    elif message["type"] == "reject":
+        print(message)
+    elif message["type"] == "fill":
+        print(message)
+    elif message["type"] == "book":
+        if message["symbol"] == "VALE":
 
-                now = time.time()
+            def best_price(side):
+                if message[side]:
+                    return message[side][0][0]
 
-                if now > vale_last_print_time + 1:
-                    vale_last_print_time = now
+            vale_bid_price = best_price("buy")
+            vale_ask_price = best_price("sell")
+
+            now = time.time()
+
+            if now > vale_last_print_time + 1:
+                vale_last_print_time = now
+                if see_bestprice:
                     print(
                         {
                             "vale_bid_price": vale_bid_price,
