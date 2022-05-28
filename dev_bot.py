@@ -29,9 +29,6 @@ def main():
 
     while True:
         message = exchange.read_message()
-        if message["type"] == "fill":
-            print("message recieved:", message)
-            if message["dir"] == "BUY": print('test')
 
         if timer_bond.update():
             # Penny Pinching
